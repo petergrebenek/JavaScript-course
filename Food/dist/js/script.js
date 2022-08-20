@@ -198,13 +198,18 @@ window.addEventListener("DOMContentLoaded", () => {
   const modalTrigger = document.querySelectorAll("[data-modal]"),
         modal = document.querySelector(".modal"),
         modalCloseBtn = document.querySelector("[data-close]");
-  modalTrigger.forEach(btn => {
-    btn.addEventListener("click", () => {
-      modal.classList.add("show");
-      modal.classList.remove("hide"); // modal.classList.toggle("show");
 
-      document.body.style.overflow = "hidden"; //отключить скрол
-    });
+  function openModal() {
+    modal.classList.add("show");
+    modal.classList.remove("hide"); // modal.classList.toggle("show");
+
+    document.body.style.overflow = "hidden"; //отключить скрол
+
+    clearInterval(modalTimerId);
+  }
+
+  modalTrigger.forEach(btn => {
+    btn.addEventListener("click", openModal);
   });
 
   function closeModal() {
@@ -225,6 +230,21 @@ window.addEventListener("DOMContentLoaded", () => {
       closeModal();
     }
   });
+  const modalTimerId = setTimeout(openModal, 5000);
+
+  const showModalByScroll = () => {
+    if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
+      openModal();
+      window.removeEventListener("scroll", showModalByScroll);
+    }
+
+    console.log(window.pageYOffset); // кол-во пикселей на которое прокручен документ
+
+    console.log(document.documentElement.clientHeight);
+    console.log(document.documentElement.scrollHeight); // изм-ие h контента, вкл-ая содержимое, нев-ое из-за прокрутки
+  };
+
+  window.addEventListener("scroll", showModalByScroll);
 });
 
 /***/ })

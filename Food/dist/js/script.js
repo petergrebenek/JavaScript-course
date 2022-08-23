@@ -91,7 +91,7 @@
   !*** ./src/js/main.js ***!
   \************************/
 /*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, exports) {
 
 window.addEventListener("DOMContentLoaded", () => {
   //####################### СОЗДАНИЕ ТАБОВ ############################
@@ -225,7 +225,7 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   });
   document.addEventListener("keydown", e => {
-    if (e.code =  true && modal.classList.contains("show")) {
+    if (e.code === "Escape" && modal.classList.contains("show")) {
       closeModal();
     }
   }); // const modalTimerId = setTimeout(openModal, 5000);
@@ -234,12 +234,10 @@ window.addEventListener("DOMContentLoaded", () => {
     if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
       openModal();
       window.removeEventListener("scroll", showModalByScroll);
-    }
+    } // console.log(window.pageYOffset); // кол-во пикселей на которое прокручен документ
+    // console.log(document.documentElement.clientHeight);
+    // console.log(document.documentElement.scrollHeight); // изм-ие h контента, вкл-ая содержимое, нев-ое из-за прокрутки
 
-    console.log(window.pageYOffset); // кол-во пикселей на которое прокручен документ
-
-    console.log(document.documentElement.clientHeight);
-    console.log(document.documentElement.scrollHeight); // изм-ие h контента, вкл-ая содержимое, нев-ое из-за прокрутки
   };
 
   window.addEventListener("scroll", showModalByScroll); //####################### ИСПОЛЬЗУЕМ КЛАССЫ ДЛЯ КАРТОЧЕК ############################
@@ -290,7 +288,52 @@ window.addEventListener("DOMContentLoaded", () => {
 
   new MenuCard("img/tabs/vegy.jpg", "vegy", 'Меню "Фитнес"', 'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!', 9, ".menu .container").render();
   new MenuCard("img/tabs/elite.jpg", "elite", "Меню “Премиум”", "В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты,фрукты - ресторанное меню без похода в ресторан!", 15, ".menu .container", "menu__item", "big").render();
-  new MenuCard("img/tabs/post.jpg", "post", 'Меню "Постное"', "Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.", 12, ".menu .container", "menu__item", "big").render();
+  new MenuCard("img/tabs/post.jpg", "post", 'Меню "Постное"', "Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.", 12, ".menu .container", "menu__item", "big").render(); // ==================================== Отправка формм ============================
+
+  const forms = document.querySelectorAll("form");
+  const message = {
+    loading: "Загрузка",
+    success: "Спасибо! Скоро мы с вами свяжемся",
+    failure: "Что-то пошло не так..."
+  };
+  forms.forEach(item => {
+    postData(item);
+  });
+
+  function postData(form) {
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+      const statusMessage = document.createElement("div");
+      statusMessage.classList.add("status");
+      statusMessage.textContent = message.loading;
+      form.append(statusMessage);
+      const request = new XMLHttpRequest();
+      request.open("POST", "server.php"); // request.setRequestHeader("Content-type", "multipart/form-data"); //не для JSON должен не используется
+
+      request.setRequestHeader("Content-type", "application/json");
+      const formData = new FormData(form);
+      const object = {}; // Необходимо, чтобы преобразовать formData
+
+      formData.forEach(function (value, key) {
+        object[key] = value;
+      });
+      const json = JSON.stringify(object);
+      request.send(json);
+      request.addEventListener("load", () => {
+        if (request.status === 200) {
+          console.log(request.response);
+          statusMessage.textContent = message.success;
+          form.reset(); //сброс введенных данных
+
+          setTimeout(() => {
+            statusMessage.remove();
+          }, 2000);
+        } else {
+          statusMessage.textContent = message.failure;
+        }
+      });
+    });
+  }
 });
 
 /***/ })

@@ -128,7 +128,7 @@ window.addEventListener("DOMContentLoaded", () => {
   });
 
   document.addEventListener("keydown", (e) => {
-    if ((e.code = "Escape" && modal.classList.contains("show"))) {
+    if (e.code === "Escape" && modal.classList.contains("show")) {
       closeModal();
     }
   });
@@ -143,9 +143,9 @@ window.addEventListener("DOMContentLoaded", () => {
       openModal();
       window.removeEventListener("scroll", showModalByScroll);
     }
-    console.log(window.pageYOffset); // кол-во пикселей на которое прокручен документ
-    console.log(document.documentElement.clientHeight);
-    console.log(document.documentElement.scrollHeight); // изм-ие h контента, вкл-ая содержимое, нев-ое из-за прокрутки
+    // console.log(window.pageYOffset); // кол-во пикселей на которое прокручен документ
+    // console.log(document.documentElement.clientHeight);
+    // console.log(document.documentElement.scrollHeight); // изм-ие h контента, вкл-ая содержимое, нев-ое из-за прокрутки
   };
   window.addEventListener("scroll", showModalByScroll);
 
@@ -217,4 +217,58 @@ window.addEventListener("DOMContentLoaded", () => {
     "menu__item",
     "big"
   ).render();
+
+  // ==================================== Отправка формм ============================
+
+  const forms = document.querySelectorAll("form");
+
+  const message = {
+    loading: "Загрузка",
+    success: "Спасибо! Скоро мы с вами свяжемся",
+    failure: "Что-то пошло не так...",
+  };
+
+  forms.forEach((item) => {
+    postData(item);
+  });
+
+  function postData(form) {
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const statusMessage = document.createElement("div");
+      statusMessage.classList.add("status");
+      statusMessage.textContent = message.loading;
+      form.append(statusMessage);
+
+      const request = new XMLHttpRequest();
+      request.open("POST", "server.php");
+      // request.setRequestHeader("Content-type", "multipart/form-data"); //не для JSON должен не используется
+      request.setRequestHeader("Content-type", "application/json");
+
+      const formData = new FormData(form);
+
+      const object = {}; // Необходимо, чтобы преобразовать formData
+      formData.forEach(function (value, key) {
+        object[key] = value;
+      });
+
+      const json = JSON.stringify(object);
+
+      request.send(json);
+
+      request.addEventListener("load", () => {
+        if (request.status === 200) {
+          console.log(request.response);
+          statusMessage.textContent = message.success;
+          form.reset(); //сброс введенных данных
+          setTimeout(() => {
+            statusMessage.remove();
+          }, 2000);
+        } else {
+          statusMessage.textContent = message.failure;
+        }
+      });
+    });
+  }
 });

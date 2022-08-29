@@ -181,4 +181,24 @@ const getPositiveIncomeAmount = (data) => {
   // return data.filter(item => item.amount > 0).reduce((acc, curr) => acc + curr.amount, 0);
 };
 
-console.log(getPositiveIncomeAmount(funds));
+// console.log(getPositiveIncomeAmount(funds));
+
+//_______________________________ПРИМЕР6__________________________________
+
+// Напишите функцию getTotalIncomeAmount, которая тоже принимает этот массив данных.
+// Eсли хотя бы один из объектов содержит отрицательное значение поля amount,
+// то функция возвращает сумму всех значений. (число)
+// Если таких значений нет - запускается функция getPositiveIncomeAmount с тем же массивом данных.
+
+// Пример: getTotalIncomeAmount(funds) => -500
+
+const getTotalIncomeAmount = (data) => {
+  //return data.some(item => item.amount < 0) ? data.reduce((acc, curr) => acc + curr.amount, 0) : getPositiveIncomeAmount(data);
+  if (data.some((item) => item.amount > 0)) {
+    return data.reduce((sum, current) => sum + current.amount, 0);
+  } else {
+    return getPositiveIncomeAmount(data);
+  }
+};
+
+console.log(getTotalIncomeAmount(funds));

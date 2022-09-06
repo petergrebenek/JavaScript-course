@@ -45,3 +45,4 @@ const a = prompt("Один из последних просмотренных ф
 personMovieDB.movies[a] = b;
 personMovieDB.movies[c] = d;
 console.log(personMovieDB);
+
